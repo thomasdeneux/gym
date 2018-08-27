@@ -1,7 +1,7 @@
-from gym import Space
+import gym
 from collections import OrderedDict
 
-class Dict(Space):
+class Dict(gym.Space):
     """
     A dictionary of simpler spaces.
 
@@ -11,8 +11,8 @@ class Dict(Space):
     Example usage [nested]:
     self.nested_observation_space = spaces.Dict({
         'sensors':  spaces.Dict({
-            'position': spaces.Box(low=-100, high=100, shape=(3)),
-            'velocity': spaces.Box(low=-1, high=1, shape=(3)),
+            'position': spaces.Box(low=-100, high=100, shape=(3,)),
+            'velocity': spaces.Box(low=-1, high=1, shape=(3,)),
             'front_cam': spaces.Tuple((
                 spaces.Box(low=0, high=1, shape=(10, 10, 3)),
                 spaces.Box(low=0, high=1, shape=(10, 10, 3))
@@ -36,10 +36,7 @@ class Dict(Space):
         if isinstance(spaces, list):
             spaces = OrderedDict(spaces)
         self.spaces = spaces
-        self.shape = self._get_shape()
-
-    def _get_shape(self):
-        return OrderedDict([(k, space.shape) for k, space in self.spaces.items()])
+        gym.Space.__init__(self, None, None) # None for shape and dtype, since it'll require special handling
 
     def sample(self):
         return OrderedDict([(k, space.sample()) for k, space in self.spaces.items()])
@@ -73,3 +70,4 @@ class Dict(Space):
                 entry[key] = value[i]
             ret.append(entry)
         return ret
+
